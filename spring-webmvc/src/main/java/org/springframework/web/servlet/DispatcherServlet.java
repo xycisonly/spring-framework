@@ -487,6 +487,7 @@ public class DispatcherServlet extends FrameworkServlet {
 
 
 	/**
+	 * 刷新，创建之后如果没有触发过就会触发，如果触发了指定事件也会触发
 	 * This implementation calls {@link #initStrategies}.
 	 */
 	@Override
@@ -495,6 +496,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
+	 * 初始化九大组件
 	 * Initialize the strategy objects that this servlet uses.
 	 * <p>May be overridden in subclasses in order to initialize further strategy objects.
 	 */
@@ -829,6 +831,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
+	 * 创建默认的组件，组件为单一的，若为多个抛出异常
+	 * LocaleResolver，ThemeResolver，RequestToViewNameTranslator，FlashMapManager
 	 * Return the default strategy object for the given strategy interface.
 	 * <p>The default implementation delegates to {@link #getDefaultStrategies},
 	 * expecting a single object in the list.
@@ -847,6 +851,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
+	 * 创建默认的组件列表
+	 * 只有MultipartResolver不调用
 	 * Create a List of default strategy objects for the given strategy interface.
 	 * <p>The default implementation uses the "DispatcherServlet.properties" file (in the same
 	 * package as the DispatcherServlet class) to determine the class names. It instantiates
@@ -857,6 +863,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	@SuppressWarnings("unchecked")
 	protected <T> List<T> getDefaultStrategies(ApplicationContext context, Class<T> strategyInterface) {
+		//从DispatcherServlet.properties中获取类名
 		String key = strategyInterface.getName();
 		String value = defaultStrategies.getProperty(key);
 		if (value != null) {
@@ -864,6 +871,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			List<T> strategies = new ArrayList<>(classNames.length);
 			for (String className : classNames) {
 				try {
+					//创建对象
 					Class<?> clazz = ClassUtils.forName(className, DispatcherServlet.class.getClassLoader());
 					Object strategy = createDefaultStrategy(context, clazz);
 					strategies.add((T) strategy);
