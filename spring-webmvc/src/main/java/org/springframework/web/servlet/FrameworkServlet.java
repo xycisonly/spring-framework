@@ -1015,12 +1015,12 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		LocaleContext localeContext = buildLocaleContext(request);
 		//获取RequestContextHolder保存的RequestAttributes
 		RequestAttributes previousAttributes = RequestContextHolder.getRequestAttributes();
-		//获取当前的RequestAttributes
+		//根据previousAttributes和request response 构建新的requestAttributes
 		ServletRequestAttributes requestAttributes = buildRequestAttributes(request, response, previousAttributes);
-
+		//todo xyc ？？？？
 		WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
 		asyncManager.registerCallableInterceptor(FrameworkServlet.class.getName(), new RequestBindingInterceptor());
-
+		//初始化新的LocaleContext和ServletRequestAttributes到对应的holder
 		initContextHolders(request, localeContext, requestAttributes);
 
 		try {
@@ -1157,6 +1157,13 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		}
 	}
 
+	/**
+	 * 发布消息
+	 * @param request
+	 * @param response
+	 * @param startTime
+	 * @param failureCause
+	 */
 	private void publishRequestHandledEvent(HttpServletRequest request, HttpServletResponse response,
 			long startTime, @Nullable Throwable failureCause) {
 
@@ -1205,6 +1212,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 
 
 	/**
+	 * 事件监听器，可自己实现，使用@component即可注册
 	 * ApplicationListener endpoint that receives events from this servlet's WebApplicationContext
 	 * only, delegating to {@code onApplicationEvent} on the FrameworkServlet instance.
 	 */
