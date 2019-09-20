@@ -76,7 +76,7 @@ public class Qps1 {
 				return;
 			}
 			//判断是否清空
-			//加上了锁，
+			//加上了锁，防止重复清空，lastTime时间混乱等问题
 			synchronized (this){
 				if (lastTime<minTime){
 					reset(now);
