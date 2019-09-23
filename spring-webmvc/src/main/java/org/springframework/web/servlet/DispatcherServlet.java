@@ -1283,6 +1283,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
+	 * 便利handlerAdapters 根据HandlerAdapter中supports方法确定
 	 * Return the HandlerAdapter for this handler object.
 	 * @param handler the handler object to find an adapter for
 	 * @throws ServletException if no HandlerAdapter can be found for the handler. This is a fatal error.
