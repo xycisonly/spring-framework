@@ -1020,9 +1020,11 @@ public class DispatcherServlet extends FrameworkServlet {
 			Exception dispatchException = null;
 
 			try {
+				//确认是不是上传请求
 				processedRequest = checkMultipart(request);
 				multipartRequestParsed = (processedRequest != request);
 
+				//通过request找handle
 				// Determine handler for the current request.
 				mappedHandler = getHandler(processedRequest);
 				if (mappedHandler == null) {
@@ -1030,9 +1032,11 @@ public class DispatcherServlet extends FrameworkServlet {
 					return;
 				}
 
+				//handle到HandlerAdapter
 				// Determine handler adapter for the current request.
 				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
 
+				//get方法
 				// Process last-modified header, if supported by the handler.
 				String method = request.getMethod();
 				boolean isGet = "GET".equals(method);
@@ -1043,18 +1047,21 @@ public class DispatcherServlet extends FrameworkServlet {
 					}
 				}
 
+				//过滤器 前置方法
 				if (!mappedHandler.applyPreHandle(processedRequest, response)) {
 					return;
 				}
 
-				// Actually invoke the handler.
+				// 处理请求方法 Actually invoke the handler.
 				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
 
+				//异步直接返回
 				if (asyncManager.isConcurrentHandlingStarted()) {
 					return;
 				}
-
+				//返回值为null 设置默认view
 				applyDefaultViewName(processedRequest, mv);
+				//过滤器后置方法
 				mappedHandler.applyPostHandle(processedRequest, response, mv);
 			}
 			catch (Exception ex) {
@@ -1065,8 +1072,10 @@ public class DispatcherServlet extends FrameworkServlet {
 				// making them available for @ExceptionHandler methods and other scenarios.
 				dispatchException = new NestedServletException("Handler dispatch failed", err);
 			}
+			//最终处理返回结果
 			processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);
 		}
+		//处理渲染异常
 		catch (Exception ex) {
 			triggerAfterCompletion(processedRequest, response, mappedHandler, ex);
 		}
@@ -1075,6 +1084,7 @@ public class DispatcherServlet extends FrameworkServlet {
 					new NestedServletException("Handler processing failed", err));
 		}
 		finally {
+			//异步的单独处理
 			if (asyncManager.isConcurrentHandlingStarted()) {
 				// Instead of postHandle and afterCompletion
 				if (mappedHandler != null) {
@@ -1082,7 +1092,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				}
 			}
 			else {
-				// Clean up any resources used by a multipart request.
+				// 清空上传请求的数据 Clean up any resources used by a multipart request.
 				if (multipartRequestParsed) {
 					cleanupMultipart(processedRequest);
 				}
@@ -1111,7 +1121,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			@Nullable Exception exception) throws Exception {
 
 		boolean errorView = false;
-
+		//请求是否有异常抛出
 		if (exception != null) {
 			if (exception instanceof ModelAndViewDefiningException) {
 				logger.debug("ModelAndViewDefiningException encountered", exception);
@@ -1124,6 +1134,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 		}
 
+		// 渲染页面
 		// Did the handler return a view to render?
 		if (mv != null && !mv.wasCleared()) {
 			render(mv, request, response);
@@ -1136,12 +1147,12 @@ public class DispatcherServlet extends FrameworkServlet {
 				logger.trace("No view rendering, null ModelAndView returned.");
 			}
 		}
-
+		//开启了异步处理
 		if (WebAsyncUtils.getAsyncManager(request).isConcurrentHandlingStarted()) {
 			// Concurrent handling started during a forward
 			return;
 		}
-
+		//过滤器的afterCompletion方法
 		if (mappedHandler != null) {
 			mappedHandler.triggerAfterCompletion(request, response, null);
 		}
@@ -1232,6 +1243,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
+	 * 一个springMVC会有多个handleMapping去寻找请求对应额Handler。
+	 * 每个handler会有对应的 @Order编号 ，顺序小的先执行。找到了handler就返回。
 	 * Return the HandlerExecutionChain for this request.
 	 * <p>Tries all handler mappings in order.
 	 * @param request current HTTP request
