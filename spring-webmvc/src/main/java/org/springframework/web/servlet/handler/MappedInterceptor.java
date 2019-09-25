@@ -138,6 +138,7 @@ public final class MappedInterceptor implements HandlerInterceptor {
 
 
 	/**
+	 * 拦截判定
 	 * Determine a match for the given lookup path.
 	 * @param lookupPath the current request path
 	 * @param pathMatcher a path matcher for path pattern matching
@@ -145,6 +146,7 @@ public final class MappedInterceptor implements HandlerInterceptor {
 	 */
 	public boolean matches(String lookupPath, PathMatcher pathMatcher) {
 		PathMatcher pathMatcherToUse = (this.pathMatcher != null ? this.pathMatcher : pathMatcher);
+		//根据拦截器设置的排除路径，进行匹配，成功返回不拦截
 		if (!ObjectUtils.isEmpty(this.excludePatterns)) {
 			for (String pattern : this.excludePatterns) {
 				if (pathMatcherToUse.match(pattern, lookupPath)) {
@@ -155,6 +157,7 @@ public final class MappedInterceptor implements HandlerInterceptor {
 		if (ObjectUtils.isEmpty(this.includePatterns)) {
 			return true;
 		}
+		//根据拦截器包括的url进行匹配，成功就拦截
 		for (String pattern : this.includePatterns) {
 			if (pathMatcherToUse.match(pattern, lookupPath)) {
 				return true;
