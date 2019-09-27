@@ -60,7 +60,10 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 	private boolean useTrailingSlashMatch = false;
 
 	private boolean lazyInitHandlers = false;
-
+	/**
+	 * key url
+	 * value handler
+	 */
 	private final Map<String, Object> handlerMap = new LinkedHashMap<>();
 
 

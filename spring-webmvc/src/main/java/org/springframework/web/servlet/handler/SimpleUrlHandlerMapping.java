@@ -131,6 +131,7 @@ public class SimpleUrlHandlerMapping extends AbstractUrlHandlerMapping {
 
 
 	/**
+	 * 重写初始化方法
 	 * Calls the {@link #registerHandlers} method in addition to the
 	 * superclass's initialization.
 	 */
@@ -141,6 +142,7 @@ public class SimpleUrlHandlerMapping extends AbstractUrlHandlerMapping {
 	}
 
 	/**
+	 *
 	 * Register all handlers specified in the URL map for the corresponding paths.
 	 * @param urlMap a Map with URL paths as keys and handler beans or bean names as values
 	 * @throws BeansException if a handler couldn't be registered
@@ -153,15 +155,19 @@ public class SimpleUrlHandlerMapping extends AbstractUrlHandlerMapping {
 		else {
 			urlMap.forEach((url, handler) -> {
 				// Prepend with slash if not already present.
+				//url前置斜杠
 				if (!url.startsWith("/")) {
 					url = "/" + url;
 				}
+				// handler 字符床去除空白
 				// Remove whitespace from handler bean name.
 				if (handler instanceof String) {
 					handler = ((String) handler).trim();
 				}
+				//绑定
 				registerHandler(url, handler);
 			});
+			//打印日志
 			if (logger.isDebugEnabled()) {
 				List<String> patterns = new ArrayList<>();
 				if (getRootHandler() != null) {
