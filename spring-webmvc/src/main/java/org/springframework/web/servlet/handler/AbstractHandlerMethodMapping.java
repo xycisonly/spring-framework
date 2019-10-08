@@ -272,10 +272,11 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 		if (handlerType != null) {
 			//如果是cdlib创建的子对象，返回其父对象，否则返回子对象
 			Class<?> userType = ClassUtils.getUserClass(handlerType);
-			//寻找对象中所有符合的方法，key 方法，value 一般为HandlerMapping
+			//寻找对象中所有符合的方法，key 方法，value 一般为HandlerMapping（RequestMappingInfo）
 			Map<Method, T> methods = MethodIntrospector.selectMethods(userType,
 					(MethodIntrospector.MetadataLookup<T>) method -> {
 						try {
+							//获取RequestMappingInfo
 							return getMappingForMethod(method, userType);
 						}
 						catch (Throwable ex) {
@@ -534,18 +535,20 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 */
 	class MappingRegistry {
 		/**
-		 * key 一般为HandlerMapping
+		 * key 一般为RequestMappingInfo
 		 */
 		private final Map<T, MappingRegistration<T>> registry = new HashMap<>();
 		/**
-		 * key 一般为HandlerMapping，value 是HandlerMethod
+		 * key 一般为RequestMappingInfo，value 是HandlerMethod
 		 */
 		private final Map<T, HandlerMethod> mappingLookup = new LinkedHashMap<>();
 		/**
-		 * key 为url，value 一般为HandlerMapping
+		 * key 为url，value 一般为RequestMappingInfo
 		 */
 		private final MultiValueMap<String, T> urlLookup = new LinkedMultiValueMap<>();
-
+		/**
+		 * key为名字（类名+#+方法名） ，value是HandlerMethod的列表
+		 */
 		private final Map<String, List<HandlerMethod>> nameLookup = new ConcurrentHashMap<>();
 
 		private final Map<HandlerMethod, CorsConfiguration> corsLookup = new ConcurrentHashMap<>();
@@ -599,24 +602,32 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 			this.readWriteLock.readLock().unlock();
 		}
 
+		/**
+		 * 注册
+		 * @param mapping  一般为RequestMappingInfo
+		 * @param handler 类
+		 * @param method handler中的方法
+		 */
 		public void register(T mapping, Object handler, Method method) {
 			this.readWriteLock.writeLock().lock();
 			try {
+				//由方法和类 构建HandlerMethod
 				HandlerMethod handlerMethod = createHandlerMethod(handler, method);
 				validateMethodMapping(handlerMethod, mapping);
+				//注册RequestMappingInfo的HandlerMethod
 				this.mappingLookup.put(mapping, handlerMethod);
-
+				//注册url的map
 				List<String> directUrls = getDirectUrls(mapping);
 				for (String url : directUrls) {
 					this.urlLookup.add(url, mapping);
 				}
-
+				//注册名字的map，nameLookup
 				String name = null;
 				if (getNamingStrategy() != null) {
 					name = getNamingStrategy().getName(handlerMethod, mapping);
 					addMappingName(name, handlerMethod);
 				}
-
+				//todo xyc
 				CorsConfiguration corsConfig = initCorsConfiguration(handler, method, mapping);
 				if (corsConfig != null) {
 					this.corsLookup.put(handlerMethod, corsConfig);
