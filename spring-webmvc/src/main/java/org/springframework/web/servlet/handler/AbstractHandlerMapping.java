@@ -73,22 +73,35 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 
 	@Nullable
 	private Object defaultHandler;
-
+	/**
+	 * url路径工具
+	 */
 	private UrlPathHelper urlPathHelper = new UrlPathHelper();
-
+	/**
+	 * 路径匹配器
+	 */
 	private PathMatcher pathMatcher = new AntPathMatcher();
-
+	/**
+	 * 拦截器组
+	 * extendInterceptors方法对其进行初始化
+	 */
 	private final List<Object> interceptors = new ArrayList<>();
-
+	/**
+	 * 初始化后的拦截器，initInterceptors方法把interceptors初始化到adaptedInterceptors中
+	 */
 	private final List<HandlerInterceptor> adaptedInterceptors = new ArrayList<>();
 
 	@Nullable
 	private CorsConfigurationSource corsConfigurationSource;
 
 	private CorsProcessor corsProcessor = new DefaultCorsProcessor();
-
+	/**
+	 * 排序
+	 */
 	private int order = Ordered.LOWEST_PRECEDENCE;  // default: same as non-Ordered
-
+	/**
+	 * bean名字
+	 */
 	@Nullable
 	private String beanName;
 
@@ -275,6 +288,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 
 
 	/**
+	 * 实现WebApplicationObjectSupport的抽象方法，启动时候自动调用
 	 * Initializes the interceptors.
 	 * @see #extendInterceptors(java.util.List)
 	 * @see #initInterceptors()
@@ -334,6 +348,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	}
 
 	/**
+	 * 将各种类型的interceptor适配成可以使用的HandlerInterceptor
 	 * Adapt the given interceptor object to the {@link HandlerInterceptor} interface.
 	 * <p>By default, the supported interceptor types are {@link HandlerInterceptor}
 	 * and {@link WebRequestInterceptor}. Each given {@link WebRequestInterceptor}
@@ -349,6 +364,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 		if (interceptor instanceof HandlerInterceptor) {
 			return (HandlerInterceptor) interceptor;
 		}
+		//针对WebRequestInterceptor子类进行封装
 		else if (interceptor instanceof WebRequestInterceptor) {
 			return new WebRequestHandlerInterceptorAdapter((WebRequestInterceptor) interceptor);
 		}
@@ -408,7 +424,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 			String handlerName = (String) handler;
 			handler = obtainApplicationContext().getBean(handlerName);
 		}
-		//构建handler链子
+		//构建handler链子，就是加入过滤器
 		HandlerExecutionChain executionChain = getHandlerExecutionChain(handler, request);
 
 		if (logger.isTraceEnabled()) {
@@ -417,7 +433,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 		else if (logger.isDebugEnabled() && !request.getDispatcherType().equals(DispatcherType.ASYNC)) {
 			logger.debug("Mapped to " + executionChain.getHandler());
 		}
-
+		//todo xyc？？
 		if (hasCorsConfigurationSource(handler)) {
 			CorsConfiguration config = (this.corsConfigurationSource != null ? this.corsConfigurationSource.getCorsConfiguration(request) : null);
 			CorsConfiguration handlerConfig = getCorsConfiguration(handler, request);
