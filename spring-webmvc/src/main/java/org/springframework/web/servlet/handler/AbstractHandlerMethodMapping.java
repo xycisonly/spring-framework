@@ -361,15 +361,21 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	// Handler method lookup
 
 	/**
+	 * 实现父类的抽象方法，根据请求获取handler
 	 * Look up a handler method for the given request.
 	 */
 	@Override
 	protected HandlerMethod getHandlerInternal(HttpServletRequest request) throws Exception {
+		//获取URL
 		String lookupPath = getUrlPathHelper().getLookupPathForRequest(request);
+		// 设置url到request中
 		request.setAttribute(LOOKUP_PATH, lookupPath);
+		//todo xyc 为啥加锁
 		this.mappingRegistry.acquireReadLock();
 		try {
+			//根据url和requst找到HandlerMethod
 			HandlerMethod handlerMethod = lookupHandlerMethod(lookupPath, request);
+			//返回handlerMethod复制体
 			return (handlerMethod != null ? handlerMethod.createWithResolvedBean() : null);
 		}
 		finally {

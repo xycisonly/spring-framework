@@ -325,6 +325,7 @@ public class HandlerMethod {
 	}
 
 	/**
+	 * 根据当前bean的属性创建一个新的
 	 * If the provided instance contains a bean name rather than an object instance,
 	 * the bean name is resolved before a {@link HandlerMethod} is created and returned.
 	 */
