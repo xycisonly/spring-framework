@@ -29,6 +29,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
+ * handler和interceptors组成的链
  * Handler execution chain, consisting of handler object and any handler interceptors.
  * Returned by HandlerMapping's {@link HandlerMapping#getHandler} method.
  *
@@ -41,10 +42,14 @@ public class HandlerExecutionChain {
 	private static final Log logger = LogFactory.getLog(HandlerExecutionChain.class);
 
 	private final Object handler;
-
+	/**
+	 * 创建对象的时候生成这个，使用的时候传入interceptorList之中。
+	 */
 	@Nullable
 	private HandlerInterceptor[] interceptors;
-
+	/**
+	 * 真正使用到的是这个使用的时候会讲interceptors放入interceptorList中。
+	 */
 	@Nullable
 	private List<HandlerInterceptor> interceptorList;
 
@@ -60,12 +65,14 @@ public class HandlerExecutionChain {
 	}
 
 	/**
+	 * 创建这个对象
 	 * Create a new HandlerExecutionChain.
 	 * @param handler the handler object to execute
 	 * @param interceptors the array of interceptors to apply
 	 * (in the given order) before the handler itself executes
 	 */
 	public HandlerExecutionChain(Object handler, @Nullable HandlerInterceptor... interceptors) {
+		//如果handler已经是chain了，就做一下数据迁移
 		if (handler instanceof HandlerExecutionChain) {
 			HandlerExecutionChain originalChain = (HandlerExecutionChain) handler;
 			this.handler = originalChain.getHandler();

@@ -364,7 +364,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 		if (interceptor instanceof HandlerInterceptor) {
 			return (HandlerInterceptor) interceptor;
 		}
-		//针对WebRequestInterceptor子类进行封装
+		//针对WebRequestInterceptor子类进行封装成HandlerInterceptor的子类WebRequestHandlerInterceptorAdapter
 		else if (interceptor instanceof WebRequestInterceptor) {
 			return new WebRequestHandlerInterceptorAdapter((WebRequestInterceptor) interceptor);
 		}

@@ -22,6 +22,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.servlet.HandlerMapping;
 
 /**
+ * 定义制定请求和pattern路径是否匹配的接口。
  * Additional interface that a {@link HandlerMapping} can implement to expose
  * a request matching API aligned with its internal request matching
  * configuration and implementation.
