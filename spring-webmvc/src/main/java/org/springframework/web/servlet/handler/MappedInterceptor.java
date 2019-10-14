@@ -154,6 +154,7 @@ public final class MappedInterceptor implements HandlerInterceptor {
 				}
 			}
 		}
+		//includePatterns为空钱不路径匹配
 		if (ObjectUtils.isEmpty(this.includePatterns)) {
 			return true;
 		}

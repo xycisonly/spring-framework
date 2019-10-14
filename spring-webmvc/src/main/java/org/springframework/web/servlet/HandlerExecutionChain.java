@@ -134,6 +134,7 @@ public class HandlerExecutionChain {
 
 
 	/**
+	 * 顺序执行所有拦截器的preHandle。
 	 * Apply preHandle methods of registered interceptors.
 	 * @return {@code true} if the execution chain should proceed with the
 	 * next interceptor or the handler itself. Else, DispatcherServlet assumes
@@ -145,6 +146,8 @@ public class HandlerExecutionChain {
 			for (int i = 0; i < interceptors.length; i++) {
 				HandlerInterceptor interceptor = interceptors[i];
 				if (!interceptor.preHandle(request, response, this.handler)) {
+					//此时出现拦截器返回false，拦截器中断执行
+					//只处理已经执行成功的拦截器
 					triggerAfterCompletion(request, response, null);
 					return false;
 				}
@@ -170,6 +173,7 @@ public class HandlerExecutionChain {
 	}
 
 	/**
+	 * 调用拦截器的afterCompletion，但如果preHandle执行失败或者尚未执行的HandlerInterceptor不执行。
 	 * Trigger afterCompletion callbacks on the mapped HandlerInterceptors.
 	 * Will just invoke afterCompletion for all interceptors whose preHandle invocation
 	 * has successfully completed and returned true.
