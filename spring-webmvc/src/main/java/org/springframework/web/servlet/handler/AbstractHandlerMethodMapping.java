@@ -324,12 +324,14 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	}
 
 	/**
+	 * 创建HandlerMethod
 	 * Create the HandlerMethod instance.
 	 * @param handler either a bean name or an actual handler instance
 	 * @param method the target method
 	 * @return the created HandlerMethod
 	 */
 	protected HandlerMethod createHandlerMethod(Object handler, Method method) {
+		//如果是String类型，需要找到他对应的bean
 		if (handler instanceof String) {
 			return new HandlerMethod((String) handler,
 					obtainApplicationContext().getAutowireCapableBeanFactory(), method);
@@ -396,13 +398,13 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	protected HandlerMethod lookupHandlerMethod(String lookupPath, HttpServletRequest request) throws Exception {
 		//match用于保存匹配条件（RequestMappingInfo）和handler
 		List<Match> matches = new ArrayList<>();
-		//根据路径获取RequestMappingInfo的列表
+		//根据url直接获取RequestMappingInfo的列表
 		List<T> directPathMatches = this.mappingRegistry.getMappingsByUrl(lookupPath);
-		//将匹配到的RequestMappingInfo加入Match
+		//将匹配到的RequestMappingInfo 进行标准匹配，成功的放入matches
 		if (directPathMatches != null) {
 			addMatchingMappings(directPathMatches, matches, request);
 		}
-		//如果没有匹配到，将所有RequestMappingInfo放入Match
+		//如果没有匹配到，将所有RequestMappingInfo进行匹配成功的放入matches
 		if (matches.isEmpty()) {
 			// No choice but to go through all mappings...
 			addMatchingMappings(this.mappingRegistry.getMappings().keySet(), matches, request);
@@ -419,6 +421,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 				if (CorsUtils.isPreFlightRequest(request)) {
 					return PREFLIGHT_AMBIGUOUS_MATCH;
 				}
+				//连个优先级一致的handler ，打印日志
 				Match secondBestMatch = matches.get(1);
 				if (comparator.compare(bestMatch, secondBestMatch) == 0) {
 					Method m1 = bestMatch.handlerMethod.getMethod();
@@ -433,10 +436,17 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 			return bestMatch.handlerMethod;
 		}
 		else {
+			//匹配失败的处理
 			return handleNoMatch(this.mappingRegistry.getMappings().keySet(), lookupPath, request);
 		}
 	}
 
+	/**
+	 * 进行匹配，成功的放入matches
+	 * @param mappings
+	 * @param matches
+	 * @param request
+	 */
 	private void addMatchingMappings(Collection<T> mappings, List<Match> matches, HttpServletRequest request) {
 		for (T mapping : mappings) {
 			T match = getMatchingMapping(mapping, request);
@@ -447,6 +457,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	}
 
 	/**
+	 * fsdafsf
 	 * Invoked when a matching mapping is found.
 	 * @param mapping the matching mapping
 	 * @param lookupPath mapping lookup path within the current servlet mapping
@@ -553,7 +564,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 		 */
 		private final Map<T, HandlerMethod> mappingLookup = new LinkedHashMap<>();
 		/**
-		 * key 为url，value 一般为RequestMappingInfo
+		 * key 为url，value一般为RequestMappingInfo
 		 */
 		private final MultiValueMap<String, T> urlLookup = new LinkedMultiValueMap<>();
 		/**
@@ -650,6 +661,11 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 			}
 		}
 
+		/**
+		 * 校验mapping是否存在对应的handler
+		 * @param handlerMethod
+		 * @param mapping
+		 */
 		private void validateMethodMapping(HandlerMethod handlerMethod, T mapping) {
 			// Assert that the supplied mapping is unique.
 			HandlerMethod existingHandlerMethod = this.mappingLookup.get(mapping);
