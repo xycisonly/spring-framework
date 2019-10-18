@@ -115,12 +115,14 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		implements BeanFactoryAware, InitializingBean {
 
 	/**
+	 * InitBinder注解的方法过滤器
 	 * MethodFilter that matches {@link InitBinder @InitBinder} methods.
 	 */
 	public static final MethodFilter INIT_BINDER_METHODS = method ->
 			AnnotatedElementUtils.hasAnnotation(method, InitBinder.class);
 
 	/**
+	 * ModelAttribute注解的方法过滤器
 	 * MethodFilter that matches {@link ModelAttribute @ModelAttribute} methods.
 	 */
 	public static final MethodFilter MODEL_ATTRIBUTE_METHODS = method ->
@@ -136,13 +138,17 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	 */
 	@Nullable
 	private HandlerMethodArgumentResolverComposite argumentResolvers;
-
+	/**
+	 * 用于给使用了@initBinder的方法设置参数
+	 */
 	@Nullable
 	private HandlerMethodArgumentResolverComposite initBinderArgumentResolvers;
 
 	@Nullable
 	private List<HandlerMethodReturnValueHandler> customReturnValueHandlers;
-
+	/**
+	 * 将返回值处理成ModelAndView的格式
+	 */
 	@Nullable
 	private HandlerMethodReturnValueHandlerComposite returnValueHandlers;
 
@@ -152,7 +158,9 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	private ContentNegotiationManager contentNegotiationManager = new ContentNegotiationManager();
 
 	private List<HttpMessageConverter<?>> messageConverters;
-
+	/**
+	 * RequestBodyAdvice或者ResponseBodyAdvice实现的类
+	 */
 	private List<Object> requestResponseBodyAdvice = new ArrayList<>();
 
 	@Nullable
@@ -186,11 +194,15 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	private final Map<Class<?>, SessionAttributesHandler> sessionAttributesHandlerCache = new ConcurrentHashMap<>(64);
 
 	private final Map<Class<?>, Set<Method>> initBinderCache = new ConcurrentHashMap<>(64);
-
+	/**
+	 * 全局initBinder，ControllerAdvice注解类中的initBinder注解的方法
+	 */
 	private final Map<ControllerAdviceBean, Set<Method>> initBinderAdviceCache = new LinkedHashMap<>();
 
 	private final Map<Class<?>, Set<Method>> modelAttributeCache = new ConcurrentHashMap<>(64);
-
+	/**
+	 * 全局modelAttribute，ControllerAdvice注解类中的modelAttribute
+	 */
 	private final Map<ControllerAdviceBean, Set<Method>> modelAttributeAdviceCache = new LinkedHashMap<>();
 
 
@@ -554,9 +566,12 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		return this.beanFactory;
 	}
 
-
+	/**
+	 * 初始化
+	 */
 	@Override
 	public void afterPropertiesSet() {
+		//先初始化
 		// Do this first, it may add ResponseBody advice beans
 		initControllerAdviceCache();
 
@@ -574,11 +589,16 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		}
 	}
 
+	/**
+	 * 初始化ControllerAdvice并缓存
+	 */
 	private void initControllerAdviceCache() {
 		if (getApplicationContext() == null) {
 			return;
 		}
-
+		/**
+		 * 全量寻找ControllerAdvice注解的bean
+		 */
 		List<ControllerAdviceBean> adviceBeans = ControllerAdviceBean.findAnnotatedBeans(getApplicationContext());
 
 		List<Object> requestResponseBodyAdviceBeans = new ArrayList<>();
@@ -588,23 +608,26 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			if (beanType == null) {
 				throw new IllegalStateException("Unresolvable type for ControllerAdviceBean: " + adviceBean);
 			}
+			//ModelAttribute注解的方法
 			Set<Method> attrMethods = MethodIntrospector.selectMethods(beanType, MODEL_ATTRIBUTE_METHODS);
 			if (!attrMethods.isEmpty()) {
 				this.modelAttributeAdviceCache.put(adviceBean, attrMethods);
 			}
+			//InitBinder注解的方法
 			Set<Method> binderMethods = MethodIntrospector.selectMethods(beanType, INIT_BINDER_METHODS);
 			if (!binderMethods.isEmpty()) {
 				this.initBinderAdviceCache.put(adviceBean, binderMethods);
 			}
+			//<a> 找到 被加上ControllerAdviceBean注解 且实现RequestBodyAdvice或ResponseBodyAdvice接口的对象
 			if (RequestBodyAdvice.class.isAssignableFrom(beanType) || ResponseBodyAdvice.class.isAssignableFrom(beanType)) {
 				requestResponseBodyAdviceBeans.add(adviceBean);
 			}
 		}
-
+		//<a>处生成对象加入，不能直接加入，这样做是为了保证顺序
 		if (!requestResponseBodyAdviceBeans.isEmpty()) {
 			this.requestResponseBodyAdvice.addAll(0, requestResponseBodyAdviceBeans);
 		}
-
+		//日志记录
 		if (logger.isDebugEnabled()) {
 			int modelSize = this.modelAttributeAdviceCache.size();
 			int binderSize = this.initBinderAdviceCache.size();
