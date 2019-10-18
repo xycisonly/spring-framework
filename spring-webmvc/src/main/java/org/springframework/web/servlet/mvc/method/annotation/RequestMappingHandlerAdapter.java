@@ -131,6 +131,9 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	@Nullable
 	private List<HandlerMethodArgumentResolver> customArgumentResolvers;
 
+	/**
+	 * 用于处理ModelAttribute设置的参数
+	 */
 	@Nullable
 	private HandlerMethodArgumentResolverComposite argumentResolvers;
 
