@@ -574,7 +574,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		//先初始化
 		// Do this first, it may add ResponseBody advice beans
 		initControllerAdviceCache();
-
+		//以下三个是自定义的解析器，顺序也是固定的
 		if (this.argumentResolvers == null) {
 			List<HandlerMethodArgumentResolver> resolvers = getDefaultArgumentResolvers();
 			this.argumentResolvers = new HandlerMethodArgumentResolverComposite().addResolvers(resolvers);
@@ -797,9 +797,11 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			HttpServletResponse response, HandlerMethod handlerMethod) throws Exception {
 
 		ModelAndView mav;
+		//检验请求
 		checkRequest(request);
 
 		// Execute invokeHandlerMethod in synchronized block if required.
+		//同步 session。synchronizeOnSession为true 且存在session才会枷锁
 		if (this.synchronizeOnSession) {
 			HttpSession session = request.getSession(false);
 			if (session != null) {

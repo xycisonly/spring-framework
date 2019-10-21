@@ -7,21 +7,23 @@ import java.util.ArrayList;
  */
 public class mian {
 	public static void main(String[] args) {
-		System.out.println(reverseBits(43261596));
+		System.out.println(isPowerOfTwo(-2147483648));
 	}
-	public static int reverseBits(int n) {
-		ArrayList<Integer> list = new ArrayList<>();
-		while (n!=0){
-
-			list.add(n%2);
-			n = n >>> 1;
-
+	public static boolean isPowerOfTwo(int n) {
+		int result = 0;
+		if ((n>>31 &1)==1){
+			return false;
 		}
-		int  reault =0;
-		for (Integer a:list){
-			reault = reault << 1 +a;
+		for(int index=0;index<31;index++){
+			int a = n>>index;
+			int oneNum= a&1;
+			if(oneNum==1){
+				result++;
+			}
+			if(result==2){
+				return false;
+			}
 		}
-		return reault;
-
+		return result == 1;
 	}
 }
