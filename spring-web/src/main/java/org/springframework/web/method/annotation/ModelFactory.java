@@ -177,6 +177,7 @@ public final class ModelFactory {
 	}
 
 	/**
+	 * 判断session状态，如果已经使用完，就要把request中session的参数消除
 	 * Promote model attributes listed as {@code @SessionAttributes} to the session.
 	 * Add {@link BindingResult} attributes where necessary.
 	 * @param request the current request

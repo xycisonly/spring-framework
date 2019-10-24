@@ -48,17 +48,30 @@ import org.springframework.web.bind.support.SimpleSessionStatus;
  * @since 3.1
  */
 public class ModelAndViewContainer {
-
+	/**
+	 * 是否不能使用defaultModel
+	 */
 	private boolean ignoreDefaultModelOnRedirect = false;
-
+	/**
+	 * 实际是String类型
+	 */
 	@Nullable
 	private Object view;
-
+	/**
+	 * 默认model
+	 * 类型为BindingAwareModelMap
+	 */
 	private final ModelMap defaultModel = new BindingAwareModelMap();
-
+	/**
+	 * 重定向model
+	 * 类型为RedirectAttributesModelMap
+	 */
 	@Nullable
 	private ModelMap redirectModel;
-
+	/**
+	 * 处理器返回重定向视图的标志
+	 * ReturnValueHandler可能将其变true
+	 */
 	private boolean redirectModelScenario = false;
 
 	@Nullable
@@ -67,9 +80,13 @@ public class ModelAndViewContainer {
 	private final Set<String> noBinding = new HashSet<>(4);
 
 	private final Set<String> bindingDisabled = new HashSet<>(4);
-
+	/**
+	 * sessionAttribute是否使用完的标志
+	 */
 	private final SessionStatus sessionStatus = new SimpleSessionStatus();
-
+	/**
+	 * 请求是否已经处理完成。true不再进行处理
+	 */
 	private boolean requestHandled = false;
 
 
@@ -132,6 +149,7 @@ public class ModelAndViewContainer {
 	}
 
 	/**
+	 * 获取model
 	 * Return the model to use -- either the "default" or the "redirect" model.
 	 * The default model is used if {@code redirectModelScenario=false} or
 	 * there is no redirect model (i.e. RedirectAttributes was not declared as
@@ -150,6 +168,9 @@ public class ModelAndViewContainer {
 	}
 
 	/**
+	 * 是否使用DefaultModel，使用情况如下：
+	 * 1 redirectModelScenario 为false（不能返会反射视图）
+	 * 2 redirectModel为空且ignoreDefaultModelOnRedirect为false（能返回反射视图，但反射视图是空的，设置为不忽略DefaultModel）
 	 * Whether to use the default model or the redirect model.
 	 */
 	private boolean useDefaultModel() {
@@ -268,6 +289,7 @@ public class ModelAndViewContainer {
 	}
 
 	/**
+	 * model添加参数
 	 * Add the supplied attribute to the underlying model.
 	 * A shortcut for {@code getModel().addAttribute(String, Object)}.
 	 */
@@ -277,6 +299,7 @@ public class ModelAndViewContainer {
 	}
 
 	/**
+	 * model添加参数
 	 * Add the supplied attribute to the underlying model.
 	 * A shortcut for {@code getModel().addAttribute(Object)}.
 	 */
@@ -286,6 +309,7 @@ public class ModelAndViewContainer {
 	}
 
 	/**
+	 * model添加多个参数
 	 * Copy all attributes to the underlying model.
 	 * A shortcut for {@code getModel().addAllAttributes(Map)}.
 	 */
@@ -295,6 +319,7 @@ public class ModelAndViewContainer {
 	}
 
 	/**
+	 * model合并参数，已经已经有了不更改，没有添加
 	 * Copy attributes in the supplied {@code Map} with existing objects of
 	 * the same name taking precedence (i.e. not getting replaced).
 	 * A shortcut for {@code getModel().mergeAttributes(Map<String, ?>)}.
@@ -305,6 +330,7 @@ public class ModelAndViewContainer {
 	}
 
 	/**
+	 * model移除参数
 	 * Remove the given attributes from the model.
 	 */
 	public ModelAndViewContainer removeAttributes(@Nullable Map<String, ?> attributes) {
@@ -317,6 +343,7 @@ public class ModelAndViewContainer {
 	}
 
 	/**
+	 * model是否包含参数
 	 * Whether the underlying model contains the given attribute name.
 	 * A shortcut for {@code getModel().containsAttribute(String)}.
 	 */
