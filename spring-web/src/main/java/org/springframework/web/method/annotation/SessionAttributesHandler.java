@@ -32,6 +32,7 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.context.request.WebRequest;
 
 /**
+ * 封装了一个handler所在class对应的@SessionAttribute注解所含有的信息
  * Manages controller-specific session attributes declared via
  * {@link SessionAttributes @SessionAttributes}. Actual storage is
  * delegated to a {@link SessionAttributeStore} instance.
@@ -47,13 +48,22 @@ import org.springframework.web.context.request.WebRequest;
  * @since 3.1
  */
 public class SessionAttributesHandler {
-
+	/**
+	 * 参数名
+	 */
 	private final Set<String> attributeNames = new HashSet<>();
-
+	/**
+	 * 参数类型
+	 */
 	private final Set<Class<?>> attributeTypes = new HashSet<>();
-
+	/**
+	 * 保存过的属性名
+	 */
 	private final Set<String> knownAttributeNames = Collections.newSetFromMap(new ConcurrentHashMap<>(4));
-
+	/**
+	 * 执行存储的工具类
+	 * 默认是DefaultSessionAttributeStore
+	 */
 	private final SessionAttributeStore sessionAttributeStore;
 
 
