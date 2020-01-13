@@ -404,7 +404,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 		if (directPathMatches != null) {
 			addMatchingMappings(directPathMatches, matches, request);
 		}
-		//如果没有匹配到，将所有RequestMappingInfo进行匹配成功的放入matches
+		//如果没有匹配到，将所有RequestMappingInfo进行匹配，成功的放入matches
 		if (matches.isEmpty()) {
 			// No choice but to go through all mappings...
 			addMatchingMappings(this.mappingRegistry.getMappings().keySet(), matches, request);
