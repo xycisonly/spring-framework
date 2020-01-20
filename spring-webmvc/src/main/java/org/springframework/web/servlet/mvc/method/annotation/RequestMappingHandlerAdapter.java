@@ -806,7 +806,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		checkRequest(request);
 
 		// Execute invokeHandlerMethod in synchronized block if required.
-		//同步 session。synchronizeOnSession为true 且存在session才会枷锁
+		//同步 session。synchronizeOnSession为true 且存在session才会枷锁 ,保证同一个session互斥
 		if (this.synchronizeOnSession) {
 			HttpSession session = request.getSession(false);
 			if (session != null) {

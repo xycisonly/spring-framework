@@ -130,6 +130,7 @@ public interface HandlerInterceptor {
 	 * 概念上相当于finnaly，倒序执行 ，调用时间：
 	 * 1 图像渲染之后（handler抛出异常不影响图像渲染）
 	 * 2 图像渲染抛出异常
+	 * 3 拦截器调用返回false
 	 * 注意：如果一次请求中执行 preHandle返回false，此时返回false和尚未执行的Interceptor，这两种都不会执行HandlerInterceptor的afterCompletion方法。
 	 * 		只会执行已经执行成功的HandlerInterceptor的afterCompletion方法。
 	 * Callback after completion of request processing, that is, after rendering
