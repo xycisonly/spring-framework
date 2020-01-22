@@ -39,6 +39,7 @@ public abstract class AbstractHandlerMethodAdapter extends WebContentGenerator i
 
 
 	public AbstractHandlerMethodAdapter() {
+		//不进行请求方式（get post。。。） 的过滤
 		// no restriction of HTTP methods by default
 		super(false);
 	}
