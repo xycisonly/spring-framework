@@ -85,6 +85,7 @@ public final class ModelFactory {
 
 
 	/**
+	 * 初始化model
 	 * Populate the model in the following order:
 	 * <ol>
 	 * <li>Retrieve "known" session attributes listed as {@code @SessionAttributes}.
@@ -100,11 +101,12 @@ public final class ModelFactory {
 	 */
 	public void initModel(NativeWebRequest request, ModelAndViewContainer container, HandlerMethod handlerMethod)
 			throws Exception {
-
+		//@SessionAttributes处理
 		Map<String, ?> sessionAttributes = this.sessionAttributesHandler.retrieveAttributes(request);
 		container.mergeAttributes(sessionAttributes);
+		//@ModelAttribute处理
 		invokeModelAttributeMethods(request, container);
-
+		//使用其他处理器中保存的SessionAttributes的参数来设置@ModelAttribute
 		for (String name : findSessionAttributeArguments(handlerMethod)) {
 			if (!container.containsAttribute(name)) {
 				Object value = this.sessionAttributesHandler.retrieveAttribute(request, name);
@@ -117,17 +119,20 @@ public final class ModelFactory {
 	}
 
 	/**
+	 * @ModelAttribute 注解的参数放入model中
 	 * Invoke model attribute methods to populate the model.
 	 * Attributes are added only if not already present in the model.
 	 */
 	private void invokeModelAttributeMethods(NativeWebRequest request, ModelAndViewContainer container)
 			throws Exception {
-
 		while (!this.modelMethods.isEmpty()) {
+			//获取被ModelAttribute注解的方法
 			InvocableHandlerMethod modelMethod = getNextModelMethod(container).getHandlerMethod();
 			ModelAttribute ann = modelMethod.getMethodAnnotation(ModelAttribute.class);
 			Assert.state(ann != null, "No ModelAttribute annotation");
+			//如果已经有这个字段，则跳过，防止覆盖
 			if (container.containsAttribute(ann.name())) {
+				//标注不绑定字段
 				if (!ann.binding()) {
 					container.setBindingDisabled(ann.name());
 				}
@@ -135,8 +140,10 @@ public final class ModelFactory {
 			}
 
 			Object returnValue = modelMethod.invokeForRequest(request, container);
+			//如果是Void则说明，方法会自己将参数放入model中，所以跳过
 			if (!modelMethod.isVoid()){
 				String returnValueName = getNameForReturnValue(returnValue, modelMethod.getReturnType());
+				//标注不绑定字段
 				if (!ann.binding()) {
 					container.setBindingDisabled(returnValueName);
 				}
@@ -160,6 +167,7 @@ public final class ModelFactory {
 	}
 
 	/**
+	 * 寻找两个注解都存在的值
 	 * Find {@code @ModelAttribute} arguments also listed as {@code @SessionAttributes}.
 	 */
 	private List<String> findSessionAttributeArguments(HandlerMethod handlerMethod) {
@@ -192,12 +200,15 @@ public final class ModelFactory {
 		else {
 			this.sessionAttributesHandler.storeAttributes(request, defaultModel);
 		}
+		//判断是否需要渲染页面，如果model不是defaultModel，那就是redirectModel不需要渲染，handler处理完成也不需要渲染。
 		if (!container.isRequestHandled() && container.getModel() == defaultModel) {
+			//处理@InitBinder设置的
 			updateBindingResult(request, defaultModel);
 		}
 	}
 
 	/**
+	 * 进行处理
 	 * Add {@link BindingResult} attributes to the model for attributes that require it.
 	 */
 	private void updateBindingResult(NativeWebRequest request, ModelMap model) throws Exception {

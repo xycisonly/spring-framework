@@ -63,18 +63,26 @@ public class HandlerMethod {
 
 	/** Logger that is available to subclasses. */
 	protected final Log logger = LogFactory.getLog(getClass());
-
+	/**
+	 * handler，如果是String则需要从beanfactory获取
+	 */
 	private final Object bean;
-
+	/**
+	 * javaBean创建和获取工具
+	 */
 	@Nullable
 	private final BeanFactory beanFactory;
 
 	private final Class<?> beanType;
 
 	private final Method method;
-
+	/**
+	 * 若method为bridge method，则bridgedMethod记录原本的方法。否则等于method
+	 */
 	private final Method bridgedMethod;
-
+	/**
+	 * handler方法的参数
+	 */
 	private final MethodParameter[] parameters;
 
 	@Nullable
@@ -326,6 +334,7 @@ public class HandlerMethod {
 
 	/**
 	 * 根据当前bean的属性创建一个新的
+	 * 主要是将String类型的handler从beanFactor中创建真正的handler
 	 * If the provided instance contains a bean name rather than an object instance,
 	 * the bean name is resolved before a {@link HandlerMethod} is created and returned.
 	 */

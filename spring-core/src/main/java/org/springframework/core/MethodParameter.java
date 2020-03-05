@@ -65,34 +65,52 @@ public class MethodParameter {
 
 
 	private final Executable executable;
-
+	/**
+	 * 从0开始，参数序号
+	 */
 	private final int parameterIndex;
 
 	@Nullable
 	private volatile Parameter parameter;
-
+	/**
+	 * 嵌套层数，从1开始
+	 */
 	private int nestingLevel;
-
+	/**
+	 * 嵌套参数每层所在的序号
+	 */
 	/** Map from Integer level to Integer type index. */
 	@Nullable
 	Map<Integer, Integer> typeIndexesPerLevel;
-
+	/**
+	 * handler所在的类
+	 */
 	/** The containing class. Could also be supplied by overriding {@link #getContainingClass()} */
 	@Nullable
 	private volatile Class<?> containingClass;
-
+	/**
+	 * 参数类
+	 */
 	@Nullable
 	private volatile Class<?> parameterType;
-
+	/**
+	 * 参数类型，同parameterType
+	 */
 	@Nullable
 	private volatile Type genericParameterType;
-
+	/**
+	 * 参数上的注解
+	 */
 	@Nullable
 	private volatile Annotation[] parameterAnnotations;
-
+	/**
+	 * 参数名称查找器
+	 */
 	@Nullable
 	private volatile ParameterNameDiscoverer parameterNameDiscoverer;
-
+	/**
+	 * 参数名称
+	 */
 	@Nullable
 	private volatile String parameterName;
 

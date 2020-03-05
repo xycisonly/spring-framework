@@ -57,7 +57,7 @@ public class SessionAttributesHandler {
 	 */
 	private final Set<Class<?>> attributeTypes = new HashSet<>();
 	/**
-	 * 保存过的属性名
+	 * 保存过的属性名，主要用于清空
 	 */
 	private final Set<String> knownAttributeNames = Collections.newSetFromMap(new ConcurrentHashMap<>(4));
 	/**
@@ -130,6 +130,7 @@ public class SessionAttributesHandler {
 	}
 
 	/**
+	 * 将注解中的字段从session中放入model中
 	 * Retrieve "known" attributes from the session, i.e. attributes listed
 	 * by name in {@code @SessionAttributes} or attributes previously stored
 	 * in the model that matched by type.

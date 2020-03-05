@@ -78,7 +78,7 @@ public class ModelAndViewContainer {
 	private HttpStatus status;
 
 	private final Set<String> noBinding = new HashSet<>(4);
-
+	//不绑定的字段
 	private final Set<String> bindingDisabled = new HashSet<>(4);
 	/**
 	 * sessionAttribute是否使用完的标志
