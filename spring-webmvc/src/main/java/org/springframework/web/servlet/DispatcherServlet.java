@@ -1030,7 +1030,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			Exception dispatchException = null;
 
 			try {
-				//确认是不是上传请求
+				//确认是不是上传请求，MultipartResolver
 				processedRequest = checkMultipart(request);
 				multipartRequestParsed = (processedRequest != request);
 
@@ -1065,7 +1065,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				// 处理请求方法 Actually invoke the handler.
 				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
 
-				//异步直接返回
+				//异步直接返回，ViewNameTranslator
 				if (asyncManager.isConcurrentHandlingStarted()) {
 					return;
 				}
